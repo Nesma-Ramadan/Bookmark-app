@@ -1,0 +1,7 @@
+
+.bg{
+    background:linear-gradient(#033f5280,#033f5280), url(../image/colorful-abstract-textured-background-design.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
