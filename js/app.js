@@ -1,101 +1,196 @@
 
 'use strict'
 
- let bookmarks = [];
-        let currentIndex = -1;
+// #region (all decleration)
 
-        if (localStorage.getItem("bookmarks")) {
-            bookmarks = JSON.parse(localStorage.getItem("bookmarks"));
-            displayBookmarks(bookmarks);
-        }
+var nameInput = document.getElementById("bookmarkName");
+var urlInput = document.getElementById("bookmarkURL");
+var table = document.getElementById("bookmarksTable");
+var addBtn = document.getElementById('addBtn');
+var updateBtn = document.getElementById('updateBtn');
 
-        function isValidURL(url) {
-            try {
-                new URL(url);
-                return true;
-            } catch {
-                return false;
-            }
-        }
 
-        function addBookmark() {
-            const name = document.getElementById("bookmarkName").value.trim();
-            const url = document.getElementById("bookmarkURL").value.trim();
 
-            if (name === "" || url === "") {
-                alert("Both fields are required!");
-                return;
-            }
+let bookmarks = [];
 
-            if (!isValidURL(url)) {
-                alert("Please enter a valid URL.");
-                return;
-            }
+// #endregion
+// #region (display data from storage)
 
-            bookmarks.push({ name, url });
-            localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
-            displayBookmarks(bookmarks);
-            clearForm();
-        }
+if (localStorage.getItem("bookmarks")) {
+    bookmarks = JSON.parse(localStorage.getItem("bookmarks"));
+    displayBookmarks(bookmarks);
+}
+// #endregion
 
-        function displayBookmarks(list) {
-            const table = document.getElementById("bookmarksTable");
-            table.innerHTML = "";
-            list.forEach((bookmark, index) => {
-                table.innerHTML += `
+// #region ( valiid url)
+
+function isValidURL(url) {
+    try {
+        new URL(url);
+        return true;
+    } catch {
+        return false;
+    }
+}
+// #endregion
+
+// #region (add new bookmark)
+
+function addBookmark() {
+
+    var nameAndUrl = {
+        nameWeb: nameInput.value,
+        urlWeb: urlInput.value,
+    }
+
+
+    if (nameInput.value === "" || urlInput.value === "") {
+        alert("The fields are required!");
+        return;
+    }
+
+    if (!isValidURL(urlInput.value)) {
+        alert("Please enter a valid URL.");
+        return;
+    }
+
+
+    bookmarks.push(nameAndUrl);
+
+    localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+
+    displayBookmarks(bookmarks);
+
+    clearForm();
+
+}
+// #endregion
+// #region (clear form)
+
+function clearForm() {
+
+    nameInput.value = '';
+    urlInput.value = '';
+
+
+}
+
+
+// #endregion
+
+// #region ( display bookmark)
+
+function displayBookmarks(list) {
+
+    table.innerHTML = "";
+
+    for (var i = 0 ; i < list.length ; i++) {
+
+        table.innerHTML += `
                     <tr class="table-info">
-                        <td>${bookmark.name}</td>
-                        <td><a href="${bookmark.url}" target="_blank" class="btn btn-success btn-sm w-100">Visit</a></td>
-                        <td><button onclick="prepareUpdate(${index})" class="btn btn-warning btn-sm w-100">Update</button></td>
-                        <td><button onclick="deleteBookmark(${index})" class="btn btn-danger btn-sm w-100">Delete</button></td>
+                        <td>${list[i].nameWeb}</td>
+                        <td><a href="${list[i].urlWeb}" target="_blank" class="btn btn-success btn-sm w-100">Visit</a></td>
+                        <td><button onclick="prepareUpdate(${list[i].oldIndex == undefined ? i : list[i].oldIndex})" class="btn btn-warning btn-sm w-100">Update</button></td>
+                        <td><button onclick="deleteBookmark(${list[i].oldIndex == undefined ? i :list[i].oldIndex})" class="btn btn-danger btn-sm w-100">Delete</button></td>
                     </tr>
                 `;
-            });
+    };
+}
+
+
+// #endregion
+
+
+// #region ( update bookmark)
+
+var currentIndex = -1;
+
+function prepareUpdate(index) {
+
+    currentIndex = index;
+
+    nameInput.value = bookmarks[index].nameWeb;
+    urlInput.value = bookmarks[index].urlWeb;
+
+    showTheUpdateButton();
+
+}
+
+function updateBookmark() {
+
+    var nameAndUrl = {
+        nameWeb: nameInput.value,
+        urlWeb: urlInput.value,
+    }
+
+    bookmarks.splice(currentIndex, 1, nameAndUrl);
+
+    localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+
+    displayBookmarks(bookmarks);
+
+    showTheAddButton();
+
+    clearForm();
+
+}
+
+// #endregion
+
+
+// #region ( show update button)
+function showTheUpdateButton() {
+
+    addBtn.classList.add('d-none');
+    updateBtn.classList.remove('d-none');
+
+}
+function showTheAddButton() {
+
+    addBtn.classList.remove('d-none');
+    updateBtn.classList.add('d-none');
+
+}
+
+// #endregion
+
+
+// #region ( delete Bookmark)
+
+function deleteBookmark(index){
+
+    bookmarks.splice(index , 1);
+     
+    localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+
+    displayBookmarks(bookmarks);
+
+
+}
+
+
+// #endregion
+
+
+// #region (search Bookmar)
+
+''.toLowerCase
+function searchBookmarks(term){
+
+var matching = [];
+
+    for( var i=0 ; i<bookmarks.length ; i++){
+
+        if(bookmarks[i].nameWeb.toLowerCase().includes(term.toLowerCase())){
+
+        matching.push({...bookmarks[i], oldIndex:i});
+
         }
+    }
 
-        function clearForm() {
-            document.getElementById("bookmarkName").value = "";
-            document.getElementById("bookmarkURL").value = "";
-            currentIndex = -1;
-            document.getElementById("addBtn").classList.remove("d-none");
-            document.getElementById("updateBtn").classList.add("d-none");
-        }
+    displayBookmarks(matching);
+}
 
-        function deleteBookmark(index) {
-            bookmarks.splice(index, 1);
-            localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
-            displayBookmarks(bookmarks);
-        }
-
-        function prepareUpdate(index) {
-            document.getElementById("bookmarkName").value = bookmarks[index].name;
-            document.getElementById("bookmarkURL").value = bookmarks[index].url;
-            currentIndex = index;
-            document.getElementById("addBtn").classList.add("d-none");
-            document.getElementById("updateBtn").classList.remove("d-none");
-        }
-
-        function updateBookmark() {
-            const name = document.getElementById("bookmarkName").value.trim();
-            const url = document.getElementById("bookmarkURL").value.trim();
-
-            if (name === "" || url === "") {
-                alert("Both fields are required!");
-                return;
-            }
-
-            if (!isValidURL(url)) {
-                alert("Please enter a valid URL.");
-                return;
-            }
-
-            bookmarks[currentIndex] = { name, url };
-            localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
-            displayBookmarks(bookmarks);
-            clearForm();
-        }
-
-        function searchBookmarks(term) {
-            const filtered = bookmarks.filter(b => b.name.toLowerCase().includes(term.toLowerCase()));
-            displayBookmarks(filtered);
-        }
+// #endregion
+// #region
+// #endregion
