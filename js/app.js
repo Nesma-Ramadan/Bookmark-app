@@ -14,6 +14,8 @@ var updateBtn = document.getElementById('updateBtn');
 let bookmarks = [];
 
 // #endregion
+
+
 // #region (display data from storage)
 
 if (localStorage.getItem("bookmarks")) {
@@ -65,6 +67,8 @@ function addBookmark() {
 
 }
 // #endregion
+
+
 // #region (clear form)
 
 function clearForm() {
@@ -191,6 +195,4 @@ var matching = [];
     displayBookmarks(matching);
 }
 
-// #endregion
-// #region
 // #endregion
